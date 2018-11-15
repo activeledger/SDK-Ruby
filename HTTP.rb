@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+
 class HTTP
 
   def doHttpHit(connection, transaction)

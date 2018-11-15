@@ -1,4 +1,6 @@
 require 'io/console'
+require 'json'
+
 
 class PreferenceUtils
 

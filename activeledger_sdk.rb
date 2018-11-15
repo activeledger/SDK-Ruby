@@ -1,8 +1,5 @@
-require 'openssl'
-require 'json'
-require 'net/http'
-require 'uri'
-require 'base64'
+
+
 require '.\PreferenceUtils'
 require '.\Crypto'
 require '.\HTTP'
@@ -30,7 +27,7 @@ class ActiveLedgerSDK
   puts "get connection #{pref_instance.getConnection}"
 
   crypto_instance = Crypto.new
-  crypto_instance.generateKeys(encryption)
+  crypto_instance.generateKeys(type)
 
   puts "private key = #{crypto_instance.getPrivateKey}"
   puts "public key = #{crypto_instance.getPublicKey}"
@@ -48,17 +45,12 @@ class ActiveLedgerSDK
 
   puts "signature --> #{signature_base64}"
 
-
-
   transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
 
-  puts "transaction = #{transaction.to_json}"
-
-
-  ###done
+  puts "transaction = #{pref_instance.convertJSONToString(transaction)}"
 
   http_instance = HTTP.new
-  response = http_instance.doHttpHit(pref_instance.getConnection,transaction.to_json)
+  response = http_instance.doHttpHit(pref_instance.getConnection,pref_instance.convertJSONToString(transaction))
 
   puts "response ---> #{response.body}"
 
