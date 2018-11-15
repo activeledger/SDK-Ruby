@@ -9,8 +9,8 @@ require '.\HTTP'
 require '.\Transaction'
 
 
-
 class ActiveLedgerSDK
+
 
   puts "Please enter the encryption mechanism you want ie RSA/EC"
   encryption = gets.chop
@@ -35,12 +35,12 @@ class ActiveLedgerSDK
   puts "private key = #{crypto_instance.getPrivateKey}"
   puts "public key = #{crypto_instance.getPublicKey}"
 
+  pref_instance.writeKeyInFile("PublicKey.txt",crypto_instance.getPublicKey)
+  pref_instance.writeKeyInFile("PrivateKey.txt",crypto_instance.getPrivateKey)
+
 
   transaction_instance = Transaction.new
   tx_obj =transaction_instance.buildTxObject(keyname,crypto_instance.getPublicKey,type)
-
-
-
 
   transaction = pref_instance.convertJSONToString(tx_obj)
   signature = crypto_instance.signTransaction(transaction)

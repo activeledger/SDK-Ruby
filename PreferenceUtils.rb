@@ -1,3 +1,5 @@
+require 'io/console'
+
 class PreferenceUtils
 
   $url = "http://testnet-uk.activeledger.io:5260"
@@ -12,6 +14,20 @@ class PreferenceUtils
 
   def convertJSONToString(json)
     return json.to_json
+  end
+
+  def writeKeyInFile(filename,key)
+    Dir.chdir(File.dirname(__FILE__))
+
+    aFile = File.new(filename, "w")
+
+    if aFile
+      aFile.syswrite(key)
+    else
+      puts "Unable to open file!"
+    end
+
+    aFile.close
   end
 
 end
