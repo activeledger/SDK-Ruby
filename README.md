@@ -47,10 +47,11 @@ There are two key types that can be generated currently, more are planned and wi
 
 ##### Example
 
-```c#
-String KeyType = "EC" or "RSA";
+```Ruby
+KeyType = "EC" or "RSA"
 
-AsymmetricCipherKeyPair keypair = ActiveLedgerLib.GenerateKeyPair.GetKeyPair(KeyType);
+crypto_instance = Crypto.new
+crypto_instance.generateKeys(type)
 ```
 
 #### Exporting Key
@@ -58,24 +59,20 @@ AsymmetricCipherKeyPair keypair = ActiveLedgerLib.GenerateKeyPair.GetKeyPair(Key
 
 ##### Example
 
-```c#
- ActiveLedgerLib.Helper.SaveKeyToFile(ActiveLedgerLib.Helper.GetPrivateKey(keypair), "privatekey.pem");
- ActiveLedgerLib.Helper.SaveKeyToFile(ActiveLedgerLib.Helper.GetPublicKey(keypair), "publickey.pem");
+```Ruby
+pref_instance.writeKeyInFile("PublicKey.txt",crypto_instance.getPublicKey)
+pref_instance.writeKeyInFile("PrivateKey.txt",crypto_instance.getPrivateKey)
 ```
 
 
-#### Onboarding a key
+#### Creating Onboard Transaction
 
-Once you have a key generated, to use it to sign transactions it must be onboarded to the ledger network
+Once you have a key generated, to use it to sign transactions it must be onboarded to the ledger network. For that purposes you need to create an Onboard Transaction
 
 ##### Example
 
-```c#
-JObject json = ActiveLedgerLib.GenerateTxJson.GetTxJsonForOnboardingKeys(keypair, KeyType);
-
-string json_str = ActiveLedgerLib.Helper.ConvertJsonToString(json);
-
-var response = ActiveLedgerLib.MakeRequest.makeRequestAsync(ActiveLedgerLib.SDKPreferences.url, json_str);
+```Ruby
+transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
 ```
 
 ---
@@ -84,8 +81,8 @@ var response = ActiveLedgerLib.MakeRequest.makeRequestAsync(ActiveLedgerLib.SDKP
 
 Creating a transaction
 
-```c#
-JObject jObject = ActiveLedgerLib.GenerateTxJson.GetBasicTxJson(JObject tx, Nullable < bool > selfSign, string sigs);
+```Ruby
+//to build
 ```
 
 
@@ -97,27 +94,18 @@ The key must be one that has been successfully onboarded to the ledger which the
 
 ##### Example
 
-```c#
-JObject tx = <transaction to send>
-string tx_str = Helper.ConvertJsonToString(tx);
-           
-//converting transaction in to byte Array
-byte[] originalData = Helper.ConvertStringToByteArray(tx_str);
-//signing the transaction
-if (keyType == "RSA")
-{
-   RsaKeyParameters priKey = (RsaKeyParameters)keypair.Private;
-   byte[] signedData = GenerateSignature.GetSignatureRSA(originalData, priKey);
-}
-else
-{
-   ECKeyParameters priECKey = (ECKeyParameters)keypair.Private;
-   byte[] signedData = GenerateSignature.GetSignatureEC(originalData, priECKey);
-}
+```Ruby
+transaction_instance = Transaction.new
+tx_obj =transaction_instance.buildTxObject(keyname,crypto_instance.getPublicKey,type)
 
+transaction = pref_instance.convertJSONToString(tx_obj)
+signature = crypto_instance.signTransaction(transaction)
+signature_base64 = crypto_instance.base64Encoding(signature)
 
-//sending the transaction to ActiveLedger
-var response = ActiveLedgerLib.MakeRequest.makeRequestAsync(ActiveLedgerLib.SDKPreferences.url, json_str);
+transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
+
+http_instance = HTTP.new
+response = http_instance.doHttpHit(pref_instance.getConnection,transaction.to_json)
 ```
 
 ## License
