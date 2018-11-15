@@ -3,8 +3,11 @@ require 'json'
 require 'net/http'
 require 'uri'
 require 'base64'
-require 'ecdsa'
-require 'securerandom'
+require '.\PreferenceUtils'
+require '.\Crypto'
+require '.\HTTP'
+require '.\Transaction'
+
 
 
 class ActiveLedgerSDK
@@ -12,78 +15,53 @@ class ActiveLedgerSDK
   puts "Please enter the encryption mechanism you want ie RSA/EC"
   encryption = gets.chop
 
-  puts "The Encryption is #{encryption}. "
+  puts "Please enter a Name for #{encryption} Key"
+  keyname = gets.chop
 
-
-  keyname = "testkey"
 
   if(encryption == "RSA")
-   key = OpenSSL::PKey::RSA.new(2048)
-   publicKey = key.public_key
-
-   type = "rsa"
+    type = "rsa"
   else
-  key = OpenSSL::PKey::EC.new("secp256k1")
-  key.generate_key
-  pub = OpenSSL::PKey::EC.new(key.public_key.group)
-  pub.public_key = key.public_key
-  publicKey = pub.to_pem
-
-  type = "secp256k1"
+    type = "secp256k1"
   end
 
-  puts "private key = #{key.to_pem}"
-  puts "public key = #{publicKey}"
+  pref_instance = PreferenceUtils.new
+  pref_instance.setConnection("http","testnet-uk.activeledger.io","5260")
+  puts "get connection #{pref_instance.getConnection}"
 
-   tx_obj ={
-           "$contract": "onboard",
-           "$namespace": "default",
-           "$i": {
-               "#{keyname}": {
-                   "publicKey": "#{publicKey}",
-                   "type": "#{type}"
-               }
-           }
-   }
+  crypto_instance = Crypto.new
+  crypto_instance.generateKeys(encryption)
 
-    data = tx_obj.to_json
-    signature = key.sign(OpenSSL::Digest::SHA256.new, data)
-    signature_base64 = Base64.encode64(signature)
+  puts "private key = #{crypto_instance.getPrivateKey}"
+  puts "public key = #{crypto_instance.getPublicKey}"
 
-    puts "signature --> #{signature_base64}"
 
-  #generate transaction
-  transaction =  {
-      "$tx": {
-          "$contract": "onboard",
-          "$namespace": "default",
-          "$i": {
-              "#{keyname}": {
-                  "publicKey": "#{publicKey}",
-                  "type": "#{type}"
-              }
-          }
-      },
-      "$selfsign": true,
-      "$sigs": {
-          "#{keyname}": "#{signature_base64}"
-      }
-  }
+  transaction_instance = Transaction.new
+  tx_obj =transaction_instance.buildTxObject(keyname,crypto_instance.getPublicKey,type)
+
+
+
+
+  transaction = pref_instance.convertJSONToString(tx_obj)
+  signature = crypto_instance.signTransaction(transaction)
+  signature_base64 = crypto_instance.base64Encoding(signature)
+
+  puts "signature --> #{signature_base64}"
+
+
+
+  transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
 
   puts "transaction = #{transaction.to_json}"
 
-  # http hit
-  uri = URI.parse("http://testnet-uk.activeledger.io:5260")
-  header = {'Content-Type': 'text/json'}
 
-  # Create the HTTP objects
-  http = Net::HTTP.new(uri.host, uri.port)
-  request = Net::HTTP::Post.new(uri.request_uri, header)
-  request.body = transaction.to_json
+  ###done
 
-  # Send the request
-  response = http.request(request)
+  http_instance = HTTP.new
+  response = http_instance.doHttpHit(pref_instance.getConnection,transaction.to_json)
 
   puts "response ---> #{response.body}"
+
+
 
 end
