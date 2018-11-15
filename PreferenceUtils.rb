@@ -19,7 +19,7 @@ class PreferenceUtils
   def writeKeyInFile(filename,key)
     Dir.chdir(File.dirname(__FILE__))
 
-    aFile = File.new(filename, "w")
+    aFile = File.new(filename, "w+")
 
     if aFile
       aFile.syswrite(key)
