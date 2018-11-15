@@ -77,14 +77,6 @@ transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_insta
 
 ---
 
-### Transaction
-
-Creating a transaction
-
-```Ruby
-//to build
-```
-
 
 #### Signing & sending a transaction
 
