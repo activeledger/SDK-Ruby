@@ -1,8 +1,8 @@
 <img src="https://www.activeledger.io/wp-content/uploads/2018/09/Asset-23.png" alt="Activeledger" width="500"/>
 
-# Activeledger - Xamarin SDK
+# Activeledger - Ruby SDK
 
-The Activeledger Xamarin SDK has been built to provide an easy way to connect your Xamarin application to an Activeledger Network
+The Activeledger Ruby SDK has been built to provide an easy way to connect your Ruby Project to an Activeledger Network
 
 ### Activeledger
 
@@ -16,7 +16,7 @@ The Activeledger Xamarin SDK has been built to provide an easy way to connect yo
 The SDK currently supports the following functionality
 
 - Connection handling
-- Key generation
+- Key generation and Handling
 - Key onboarding
 - Transaction building
 
@@ -26,12 +26,14 @@ When sending a transaction, you must pass a connection that provides the informa
 
 To do this a connection object must be created. This object must be passed the protocol, address, and port.
 
-```c#
-ActiveLedgerLib.SDKPreferences.setConnection("protocol", "url", "port");
+```Ruby
+pref_instance = PreferenceUtils.new
+pref_instance.setConnection("protocol","url","port")
 ```
 #### Example
-```c#
-ActiveLedgerLib.SDKPreferences.setConnection("http", "testnet-uk.activeledger.io", "5260");
+```Ruby
+pref_instance = PreferenceUtils.new
+pref_instance.setConnection("http","testnet-uk.activeledger.io","5260")
 ```
 
 ---
