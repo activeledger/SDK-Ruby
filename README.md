@@ -104,6 +104,6 @@ response = http_instance.doHttpHit(pref_instance.getConnection,transaction.to_js
 
 ---
 
-This project is licensed under the [MIT](https://github.com/activeledger/activeledger/blob/master/LICENSE) License
+This project is licensed under the [MIT](https://github.com/activeledger/SDK-Ruby/blob/master/LICENSE) License
 
 
