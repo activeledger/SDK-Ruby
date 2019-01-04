@@ -7,6 +7,7 @@ class Crypto
   $privateKey = ""
   $keyObj = ""
 
+  # function takes encryption type and generate public and private key
   def generateKeys(encryption)
 
     if(encryption == "RSA")
@@ -18,14 +19,18 @@ class Crypto
       key = OpenSSL::PKey::EC.new("secp256k1")
       key.generate_key
       $keyObj = key
+      # extracting public key from keypair object
       pub = OpenSSL::PKey::EC.new(key.public_key.group)
       pub.public_key = key.public_key
+      
+      # converting public and private key to PEM format
       $publicKey = pub.to_pem
       $privateKey = key.to_pem
     end
 
   end
 
+  # function takes a transaction and returns the signature
   def signTransaction(transaction)
 
     signature = getKeyObject.sign(OpenSSL::Digest::SHA256.new, transaction)
