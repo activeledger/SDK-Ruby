@@ -42,4 +42,23 @@ class HTTP
     return response
   end
 
+  def getTerritorialityDetails(connection)
+
+    # parsing the connection to a URL
+    uri = URI.parse(connection)
+    header = {'Content-Type': 'text/json'}
+
+    # Create the HTTP objects
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Get.new(uri.request_uri, header)
+
+    # Send the request to ledger
+    response = http.request(request)
+
+    return response
+  end
+
+
+
+
 end

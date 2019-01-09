@@ -89,6 +89,10 @@ class ActiveLedgerSDK
 
   puts "response ---> #{response.body}"
 
+  response = http_instance.getTerritorialityDetails(pref_instance.territorialityDetailsURL)
+
+  puts "response ---> #{response.body}"
+
 
 
 end

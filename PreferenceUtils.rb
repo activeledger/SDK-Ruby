@@ -27,6 +27,8 @@ require 'json'
 class PreferenceUtils
 
   $url = "http://testnet-uk.activeledger.io:5260"
+  $t_url = "http://testnet-uk.activeledger.io:5260/a/status"
+
 
   # setting up connection for http request
   # requires (protocol, url and port) as an input parameters and convert them into url
@@ -36,6 +38,10 @@ class PreferenceUtils
 
   def getConnection
     return $url
+  end
+
+  def territorialityDetailsURL
+    return $t_url
   end
 
   def convertJSONToString(json)

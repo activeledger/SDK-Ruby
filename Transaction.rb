@@ -65,4 +65,20 @@ class Transaction
   end
 
 
+
+  def buildBaseTransaction(territorialityReference, transactionObject, selfsign, sigsObject)
+
+
+    #generate transaction
+    transaction =  {
+        "$territoriality": "#{territorialityReference}",
+        "$tx": "#{transactionObject}" ,
+        "$selfsign": "#{selfsign}" ,
+        "$sigs": "#{sigsObject}"
+    }
+
+    return transaction
+  end
+
+
 end

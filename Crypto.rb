@@ -33,12 +33,16 @@ class Crypto
   # function takes encryption type and generate public and private key
   def generateKeys(encryption)
 
-    if(encryption == "RSA")
+    puts "generting #{encryption} key"
+
+    if(encryption == "rsa")
+
       key = OpenSSL::PKey::RSA.new(2048)
       $keyObj = key
       $publicKey = key.public_key
       $privateKey = key.to_pem
     else
+
       key = OpenSSL::PKey::EC.new("secp256k1")
       key.generate_key
       $keyObj = key
