@@ -86,13 +86,11 @@ class ActiveLedgerSDK
   
   # HTTP hit
   response = http_instance.doHttpHit(pref_instance.getConnection,pref_instance.convertJSONToString(transaction))
-
   puts "response ---> #{response.body}"
 
+  # HTTP hit to fetch territoriality details
   response = http_instance.getTerritorialityDetails(pref_instance.territorialityDetailsURL)
-
   puts "response ---> #{response.body}"
-
 
 
 end
