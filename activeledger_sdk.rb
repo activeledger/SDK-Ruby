@@ -24,17 +24,21 @@ require '.\PreferenceUtils'
 require '.\Crypto'
 require '.\HTTP'
 require '.\Transaction'
+require '.\sseclient\SSEHandler'
+require '.\sseclient\ApiUrl'
 
 
 class ActiveLedgerSDK
 
   # prompt the user to enter the encryption type
   puts "Please enter the encryption mechanism you want ie RSA/EC"
-  encryption = gets.chop
+  # encryption = gets.chop
+  encryption = "RSA"
 
   # prompt the user to enter the key name
   puts "Please enter a Name for #{encryption} Key"
-  keyname = gets.chop
+  # keyname = gets.chop
+  keyname = "test"
 
 
   if(encryption == "RSA")
@@ -42,6 +46,15 @@ class ActiveLedgerSDK
   else
     type = "secp256k1"
   end
+
+  # Creating SSEHandler class object
+  sseh_instance = SSEHandler.new
+  # Subscribing to URL
+  sse_client = sseh_instance.sshclient("http://testnet-uk.activeledger.io:5261#{ApiUrl.getSubscribeURL()}")
+  # Observing event
+  sse_client.on_event { |event|
+        puts "activeledger event-->: #{event.type}, #{event.data}"
+    }
 
   # Creating preferenceUtils class object
   pref_instance = PreferenceUtils.new
@@ -91,6 +104,5 @@ class ActiveLedgerSDK
   # HTTP hit to fetch territoriality details
   response = http_instance.getTerritorialityDetails(pref_instance.territorialityDetailsURL)
   puts "response ---> #{response.body}"
-
 
 end
