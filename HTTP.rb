@@ -25,7 +25,7 @@ require 'uri'
 
 class HTTP
 
-  def doHttpHit(connection, transaction)
+  def HTTP.doHttpHit(connection, transaction)
 
     # parsing the connection to a URL
     uri = URI.parse(connection)
@@ -42,7 +42,7 @@ class HTTP
     return response
   end
 
-  def getTerritorialityDetails(connection)
+  def HTTP.getTerritorialityDetails(connection)
 
     # parsing the connection to a URL
     uri = URI.parse(connection)
@@ -57,8 +57,5 @@ class HTTP
 
     return response
   end
-
-
-
 
 end

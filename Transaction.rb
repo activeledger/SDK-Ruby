@@ -20,14 +20,17 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 =end
+require '.\Crypto'
+require '.\PreferenceUtils'
+
 class Transaction
 
   # function requires (keyname , public key and type of the encryption) and creates a transaction JSON object
-  def buildTxObject(keyName, publicKey, type)
+  def Transaction.buildTxObject(contract, namespace, keyName, publicKey, type)
 
     tx_obj ={
-        "$contract": "onboard",
-        "$namespace": "default",
+        "$contract": "#{contract}",
+        "$namespace": "#{namespace}",
         "$i": {
             "#{keyName}": {
                 "publicKey": "#{publicKey}",
@@ -39,9 +42,10 @@ class Transaction
     return tx_obj
   end
 
+
   # function requires (keyname , public key, signature of transaction object and type of the encryption) and creates an onboard
   #  transaction JSON object
-  def buildOnboardTransaction(keyName, publicKey, type, signature)
+  def Transaction.generateAndSendOnboardTransaction(keyName, publicKey, type, signature)
 
     #generate transaction
     transaction =  {
@@ -61,13 +65,14 @@ class Transaction
         }
     }
 
-    return transaction
+    response = HTTP.doHttpHit(PreferenceUtils.getConnection,PreferenceUtils.convertJSONToString(transaction))
+    PreferenceUtils.extractStreamID(response.body)
+
+    return response
   end
 
 
-
-  def buildBaseTransaction(territorialityReference, transactionObject, selfsign, sigsObject)
-
+  def Transaction.buildBaseTransaction(territorialityReference, transactionObject, selfsign, sigsObject)
 
     #generate transaction
     transaction =  {
@@ -80,5 +85,46 @@ class Transaction
     return transaction
   end
 
+
+  def Transaction.createAndSignTransaction(transactionObject)
+
+  signature = Crypto.signTransaction(PreferenceUtils.convertJSONToString(transactionObject))
+  signature_base64 = Crypto.base64Encoding(signature)
+
+    sigsObject =  {
+      "#{PreferenceUtils.getOnboardID}": "#{signature_base64}"
+    }
+
+    transaction =  {
+        "$tx": transactionObject ,
+        "$selfsign": false ,
+        "$sigs": sigsObject
+    }
+
+    return transaction
+  end
+
+
+  def Transaction.createLabeledTransaction(transactionObject)
+  
+    transactionObject_new = PreferenceUtils.convertJSONToString(transactionObject)
+    transactionObject_new = JSON.parse(transactionObject_new)
+    stream_id = transactionObject_new["$i"]["#{(transactionObject_new["$i"].keys)[0]}"]["$stream"]
+
+    signature = Crypto.signTransaction(PreferenceUtils.convertJSONToString(transactionObject))
+    signature_base64 = Crypto.base64Encoding(signature)
+  
+      sigsObject =  {
+        "#{stream_id}": "#{signature_base64}"
+      }
+  
+      transaction =  {
+          "$tx": transactionObject ,
+          "$selfsign": false ,
+          "$sigs": sigsObject
+      }
+  
+      return transaction
+  end
 
 end

@@ -26,30 +26,46 @@ require 'json'
 
 class PreferenceUtils
 
-  $url = "http://testnet-uk.activeledger.io:5260"
-  $t_url = "http://testnet-uk.activeledger.io:5260/a/status"
+  @@url = "http://testnet-uk.activeledger.io:5260"
+  @@sse_url = "http://testnet-uk.activeledger.io:5261"
+  @@t_url = "http://testnet-uk.activeledger.io:5260/a/status"
+
+  @@onboard_id = ""
+  @@onboard_name = ""
 
 
   # setting up connection for http request
   # requires (protocol, url and port) as an input parameters and convert them into url
-  def setConnection(protocol, url ,port)
-    $url =  "#{protocol}://#{url}:#{port}"
+  def PreferenceUtils.setConnection(protocol, url ,port)
+    @@url =  "#{protocol}://#{url}:#{port}"
   end
 
-  def getConnection
-    return $url
+  def PreferenceUtils.getConnection
+    return @@url
   end
 
-  def territorialityDetailsURL
-    return $t_url
+  def PreferenceUtils.territorialityDetailsURL
+    return @@t_url
   end
 
-  def convertJSONToString(json)
+  def PreferenceUtils.sseURL
+    return @@sse_url
+  end
+
+  def PreferenceUtils.convertJSONToString(json)
     return json.to_json
   end
 
+  def PreferenceUtils.getOnboardID
+    return @@onboard_id
+  end
+  
+  def PreferenceUtils.getOnboardName
+    return @@onboard_name
+  end
+
   # function takes filename and key as an input, writes the key into the file and saves the file to current directory
-  def writeKeyInFile(filename,key)
+  def PreferenceUtils.writeKeyInFile(filename,key)
     
     # change the directory to the root of the project
     Dir.chdir(File.dirname(__FILE__))
@@ -66,5 +82,16 @@ class PreferenceUtils
     # closes the file stream
     aFile.close
   end
+
+  # function takes filename and key as an input, writes the key into the file and saves the file to current directory
+  def PreferenceUtils.extractStreamID(onboardResponse)
+    
+    res_json = JSON.parse(onboardResponse)
+   
+    @@onboard_id = res_json['$streams']['new'][0]['id']
+    @@onboard_name = res_json['$streams']['new'][0]['name']
+
+  end
+
 
 end

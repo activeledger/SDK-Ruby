@@ -20,11 +20,12 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 =end
+require '.\PreferenceUtils'
 
 class ApiUrl
 
-  @@subscribe = "/api/activity/subscribe"
-  @@event = "/api/events"
+  @@subscribe = "#{PreferenceUtils.sseURL}/api/activity/subscribe"
+  @@event = "#{PreferenceUtils.sseURL}/api/events"
 
   def ApiUrl.getSubscribeURL()
     return @@subscribe
