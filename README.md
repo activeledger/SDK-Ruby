@@ -91,7 +91,6 @@ Once you have onboarded the keys to the ledger the user can create labeled trans
 ##### Example
 
 ```Ruby
-createLabeledTransaction
 transaction =Transaction.createLabeledTransaction(tx_object)
 ```
 ---
