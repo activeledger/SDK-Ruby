@@ -27,13 +27,11 @@ When sending a transaction, you must pass a connection that provides the informa
 To do this a connection object must be created. This object must be passed the protocol, address, and port.
 
 ```Ruby
-pref_instance = PreferenceUtils.new
-pref_instance.setConnection("protocol","url","port")
+PreferenceUtils.setConnection("protocol","url","port")
 ```
 #### Example
 ```Ruby
-pref_instance = PreferenceUtils.new
-pref_instance.setConnection("http","testnet-uk.activeledger.io","5260")
+PreferenceUtils.setConnection("http","testnet-uk.activeledger.io","5260")
 ```
 
 ---
@@ -50,8 +48,7 @@ There are two key types that can be generated currently, more are planned and wi
 ```Ruby
 KeyType = "EC" or "RSA"
 
-crypto_instance = Crypto.new
-crypto_instance.generateKeys(type)
+Crypto.generateKeys(type)
 ```
 
 #### Exporting Key
@@ -60,46 +57,91 @@ crypto_instance.generateKeys(type)
 ##### Example
 
 ```Ruby
-pref_instance.writeKeyInFile("PublicKey.txt",crypto_instance.getPublicKey)
-pref_instance.writeKeyInFile("PrivateKey.txt",crypto_instance.getPrivateKey)
+PreferenceUtils.writeKeyInFile("PublicKey.txt",crypto_instance.getPublicKey)
+PreferenceUtils.writeKeyInFile("PrivateKey.txt",crypto_instance.getPrivateKey)
 ```
 
 
-#### Creating Onboard Transaction
+#### Creating and Sending Onboard Transaction
 
 Once you have a key generated, to use it to sign transactions it must be onboarded to the ledger network. For that purposes you need to create an Onboard Transaction
 
 ##### Example
 
 ```Ruby
-transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
+tx_obj =Transaction.buildTxObject("onboard", "default", keyname,Crypto.getPublicKey,type)
+transaction = PreferenceUtils.convertJSONToString(tx_obj)
+signature = Crypto.signTransaction(transaction)
+signature_base64 = Crypto.base64Encoding(signature)
+response = Transaction.generateAndSendOnboardTransaction(keyname, Crypto.getPublicKey, type ,signature_base64)
 ```
 
+Onboard Transaction internally extracts the onboard_id and can be access through
+
+```Ruby
+PreferenceUtils.getOnboardID
+```
+---
+
+
+#### Creating Labeled Transaction
+
+Once you have onboarded the keys to the ledger the user can create labeled transactions that uses the streams id to verify transaction. The method will complete the transaction and add a signature for the user.
+
+##### Example
+
+```Ruby
+createLabeledTransaction
+transaction =Transaction.createLabeledTransaction(tx_object)
+```
 ---
 
 
 #### Signing & sending a transaction
 
 When signing a transaction you must send the finished version of it. No changes can be made after signing as this will cause the ledger to reject it.
+Once the transaction has been created the user has two choices. Either the transaction is signed manually or the SDK will add the signature.
 
 The key must be one that has been successfully onboarded to the ledger which the transaction is being sent to.
 
 ##### Example
 
 ```Ruby
-transaction_instance = Transaction.new
-tx_obj =transaction_instance.buildTxObject(keyname,crypto_instance.getPublicKey,type)
+tx_obj =Transaction.buildTxObject(keyname,crypto_instance.getPublicKey,type)
 
-transaction = pref_instance.convertJSONToString(tx_obj)
-signature = crypto_instance.signTransaction(transaction)
-signature_base64 = crypto_instance.base64Encoding(signature)
+#Manual Signing
+transaction = PreferenceUtils.convertJSONToString(tx_obj)
+signature = Crypto.signTransaction(transaction)
+signature_base64 = Crypto.base64Encoding(signature)
 
-transaction = transaction_instance.buildOnboardTransaction(keyname, crypto_instance.getPublicKey, type ,signature_base64)
+transaction = Transaction.buildOnboardTransaction(keyname, Crypto.getPublicKey, type ,signature_base64)
 
+#SDK Signing
+transaction = Transaction.createAndSignTransaction(tx_obj)
+
+#Http Hit
 http_instance = HTTP.new
-response = http_instance.doHttpHit(pref_instance.getConnection,transaction.to_json)
+response = HTTP.doHttpHit(PreferenceUtils.getConnection,PreferenceUtils.convertJSONToString(transaction))
 ```
+---
 
+
+#### Server Sent Event
+
+Server Sent Events can be subscribed by setting the event URL in PreferenceUtils. If the application want to subscribe to multiple events having different base URL then URL can be passed as a string in sshclient parameter. The available API endpoints can be found in ApiUrl.
+
+##### Example
+
+```Ruby
+# Creating SSEHandler class object
+sseh_instance = SSEHandler.new
+# Subscribing to URL
+sse_client = sseh_instance.sshclient("#{ApiUrl.getSubscribeURL()}")
+# Observing event
+sse_client.on_event { |event|
+      puts "activeledger event-->: #{event.type}, #{event.data}"
+}
+```
 ## License
 
 ---
