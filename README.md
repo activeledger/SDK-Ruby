@@ -2,6 +2,46 @@
 
 # Activeledger - Ruby SDK
 
+> ## ⚠️ Unmaintained and archived
+>
+> **This SDK is not maintained and should not be used for new work.** It was
+> last updated in 2019, is not packaged as a gem, and supports neither
+> post-quantum identities (`ml-dsa-65`, `falcon-512`) nor `secp256k1` as the
+> ledger encodes it today.
+>
+> ### Do not reuse the keys in this repository
+>
+> `PrivateKey.txt` and `PublicKey.txt` are committed here, and older private
+> keys exist in the git history. **Treat every one of them as compromised** —
+> they have been publicly readable since 2019, and archiving a repository does
+> not hide its contents.
+>
+> They appear to be throwaway keys rather than production ones: the SDK wrote
+> them to the working directory at runtime
+> (`PreferenceUtils.writeKeyInFile("PrivateKey.txt", Crypto.getPrivateKey)`),
+> and someone committed the output. That is also a warning about the SDK
+> itself — running it drops your private key into a file beside your source,
+> which is how this happened more than once.
+>
+> **If any identity on a live network still lists one of these public keys as
+> an authority, rotate it.**
+>
+> ### Maintained SDKs
+>
+> | Language | Repository | Post-quantum | secp256k1 |
+> |---|---|:---:|:---:|
+> | JavaScript / TypeScript | [SDK-JS](https://github.com/activeledger/SDK-JS) | ML-DSA-65, Falcon-512 | ✅ |
+> | Kotlin / Java / Android | [SDK-JVM](https://github.com/activeledger/SDK-JVM) | ML-DSA-65, Falcon-512 | ✅ |
+> | C# / .NET | [SDK-CSharp](https://github.com/activeledger/SDK-CSharp) | ML-DSA-65, Falcon-512 | ✅ |
+> | Python | [SDK-Python](https://github.com/activeledger/SDK-Python) | ML-DSA-65, Falcon-512 | ✅ |
+> | Go | [SDK-Golang](https://github.com/activeledger/SDK-Golang) | ML-DSA-65 | ✅ |
+> | Rust | [SDK-Rust](https://github.com/activeledger/SDK-Rust) | ML-DSA-65 | ✅ |
+> | PHP | [SDK-PHP](https://github.com/activeledger/SDK-PHP) | ML-DSA-65 | ✅ |
+>
+> There is no maintained Ruby SDK. Any of the above can be driven from Ruby
+> over HTTP, or raise an issue on
+> [activeledger](https://github.com/activeledger/activeledger) if you need one.
+
 The Activeledger Ruby SDK has been built to provide an easy way to connect your Ruby Project to an Activeledger Network
 
 ### Activeledger
